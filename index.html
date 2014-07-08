@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Task</title>
+    <script type="application/javascript" src="lib/angular.js" ></script>
+
+    <script>
+        function taskController($scope){
+            $scope.tasks = [];
+            $scope.completeTasks = [];
+
+            $scope.addTask = function() {
+                if($scope.newTask != undefined){
+                    var currentdate = new Date();
+                    var datetime = currentdate.getDate() + "/"+currentdate.getMonth()
+                            + "/" + currentdate.getFullYear() + " @ "
+                            + currentdate.getHours() + ":"
+                            + currentdate.getMinutes() + ":" + currentdate.getSeconds();
+                    $scope.tasks.push({
+                        name:$scope.newTask,
+                        status:'Not Done',
+                        date:datetime
+                    });
+                    alert('New Task "' + $scope.newTask + '" added');
+                    $scope.newTask = "";
+
+                }else
+                    alert('Please enter task');
+            }
+
+            $scope.removeTask = function() {
+                var table = document.getElementById("tableId");
+                var newList = [];
+                var rowIndex;
+                if (!document.getElementsByTagName || !document.createTextNode) return;
+                var rows = document.getElementById('tableId').getElementsByTagName('tr');
+                for (i = 0; i < rows.length; i++) {
+                    rows[i].onclick = function() {
+                        rowIndex = this.rowIndex - 1;
+                        $scope.completeTasks.push($scope.tasks[rowIndex]);
+                        $scope.completeTasks[$scope.completeTasks.length - 1].status = 'Done';
+                        for(var j = 0 ; j < $scope.tasks.length; j++) {
+                            if(rowIndex != j)
+                                newList.push($scope.tasks[j]);
+                        }
+
+                        $scope.tasks = [];
+                        $scope.tasks = newList;
+                        $scope.$apply();
+                    }
+                }
+
+            }
+        }
+    </script>
+</head>
+<body>
+<div ng-app=''>
+    <div ng-controller='taskController' align="center">
+    <h1>Add New Task in Your Menu</h1>
+    <input type="text" ng-model="newTask" placeholder="Enter Today Task">
+    <input type="button" value="+" ng-click='addTask()'/>
+        </br>
+        </br>
+        </br>
+        <h2>List of new added task </h2>
+    <table id="tableId" border="1" cellspacing="2">
+        <tr bgcolor="red">
+            <th>Task Name</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Tool</th>
+        </tr>
+        <tr ng-repeat="task in tasks">
+            <td>
+                {{task.name}}
+            </td>
+            <td>
+                {{task.date}}
+            </td><td>
+            {{task.status}}
+        </td>
+            <td>
+                <input type="BUTTON" VALUE="-" ng-click='removeTask()'/>
+
+            </td>
+        </tr>
+    </table>
+
+        </br>
+        </br>
+        </br>
+        <h2>List of completed task</h2>
+        <table border="1" cellspacing="2">
+            <tr bgcolor="green">
+                <th>Task Name</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+            <tr ng-repeat="cTask in completeTasks">
+                <td>
+                    {{cTask.name}}
+                </td>
+                <td>
+                    {{cTask.date}}
+                </td><td>
+                {{cTask.status}}
+            </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>
