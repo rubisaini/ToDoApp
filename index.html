@@ -7,11 +7,12 @@
 
     <script>
         function taskController($scope){
+
             $scope.tasks = [];
             $scope.completeTasks = [];
 
             $scope.addTask = function() {
-                if($scope.newTask != undefined){
+                if($scope.newTask != undefined && $scope.newTask != ""){
                     var currentdate = new Date();
                     var datetime = currentdate.getDate() + "/"+currentdate.getMonth()
                             + "/" + currentdate.getFullYear() + " @ "
@@ -19,11 +20,16 @@
                             + currentdate.getMinutes() + ":" + currentdate.getSeconds();
                     $scope.tasks.push({
                         name:$scope.newTask,
-                        status:'Not Done',
+                        status:'New',
                         date:datetime
                     });
-                    alert('New Task "' + $scope.newTask + '" added');
+                   // alert('New Task "' + $scope.newTask + '" added');
                     $scope.newTask = "";
+                    var newTaskTable = document.getElementById('tableId');
+                    newTaskTable.removeAttribute('hidden');
+                    var newH = document.getElementById('new');
+                    newH.setAttribute('hidden', 'hidden');
+
 
                 }else
                     alert('Please enter task');
@@ -45,27 +51,79 @@
                                 newList.push($scope.tasks[j]);
                         }
 
-                        $scope.tasks = [];
-                        $scope.tasks = newList;
-                        $scope.$apply();
+                        if(confirm("Are you sure to mark this task as done")){
+                            $scope.tasks = [];
+                            $scope.tasks = newList;
+                            $scope.$apply();
+                            var doneTaskTable = document.getElementById('tableId1');
+                            doneTaskTable.removeAttribute('hidden');
+                            var doneH = document.getElementById('done');
+                            doneH.setAttribute('hidden', 'hidden');
+
+                        }
+                        if($scope.tasks.length == 0){
+                            var newTaskTable = document.getElementById('tableId');
+                            newTaskTable.setAttribute('hidden', 'hidden');
+
+                            var newH = document.getElementById('new');
+                            newH.removeAttribute('hidden');
+
+
+                        }
+                    }
+                }
+
+            }
+
+            $scope.removeDoneTask = function() {
+                var table = document.getElementById("tableId1");
+                var newList = [];
+                var rowIndex;
+                if (!document.getElementsByTagName || !document.createTextNode) return;
+                var rows = document.getElementById('tableId1').getElementsByTagName('tr');
+                for (i = 0; i < rows.length; i++) {
+                    rows[i].onclick = function() {
+                        rowIndex = this.rowIndex - 1;
+                        for(var j = 0 ; j < $scope.completeTasks.length; j++) {
+                            if(rowIndex != j)
+                                newList.push($scope.completeTasks[j]);
+                        }
+
+                        if(confirm("Are you sure to delete done task")){
+                            $scope.completeTasks = [];
+                            $scope.completeTasks = newList;
+                            $scope.$apply();
+                        }
+                        if($scope.completeTasks.length == 0){
+                            var newTaskTable = document.getElementById('tableId1');
+                            newTaskTable.setAttribute('hidden', 'hidden');
+
+                            var newH = document.getElementById('done');
+                            newH.removeAttribute('hidden');
+
+
+                        }
                     }
                 }
 
             }
         }
     </script>
+    <link rel="stylesheet" href="style/bootstrap.css"/>
 </head>
-<body>
+<body class="modal-body">
 <div ng-app=''>
     <div ng-controller='taskController' align="center">
-    <h1>Add New Task in Your Menu</h1>
+        <h2>Add New Task in Your Menu</h2>
     <input type="text" ng-model="newTask" placeholder="Enter Today Task">
-    <input type="button" value="+" ng-click='addTask()'/>
+    <input class="btn btn-info" type="button" value="+New" ng-click='addTask()'/>
         </br>
         </br>
         </br>
-        <h2>List of new added task </h2>
-    <table id="tableId" border="1" cellspacing="2">
+        <h3>List of new added task </h3>
+        <h5 id="new" >No new task available</h5>
+
+        <table class="table" id="tableId" hidden="hidden">
         <tr bgcolor="red">
             <th>Task Name</th>
             <th>Date</th>
@@ -82,7 +140,7 @@
             {{task.status}}
         </td>
             <td>
-                <input type="BUTTON" VALUE="-" ng-click='removeTask()'/>
+                <input class="btn btn-info" type="BUTTON" VALUE="Done" ng-click='removeTask()'/>
 
             </td>
         </tr>
@@ -91,12 +149,16 @@
         </br>
         </br>
         </br>
-        <h2>List of completed task</h2>
-        <table border="1" cellspacing="2">
+        <h3>List of completed task</h3>
+        <h5 id="done" >No completed task available</h5>
+
+        <table class="table" id="tableId1" hidden="hidden">
             <tr bgcolor="green">
                 <th>Task Name</th>
                 <th>Date</th>
                 <th>Status</th>
+                <th>Tool</th>
+
             </tr>
             <tr ng-repeat="cTask in completeTasks">
                 <td>
@@ -107,6 +169,10 @@
                 </td><td>
                 {{cTask.status}}
             </td>
+                <td>
+                    <input class="btn btn-info" type="BUTTON" VALUE="Remove" ng-click='removeDoneTask()'/>
+
+                </td>
             </tr>
         </table>
     </div>
